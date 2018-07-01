@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var speedTest = require('speedtest-net');
 const LocalStorage = require('node-localstorage').LocalStorage;
-const localStorage = new LocalStorage('./local-storage');
+const localStorage = new LocalStorage('/data/local-storage');
 const storageKey = 'TIMES';
 
 const INTERVAL = 2 * 60 * 60 * 1000;
