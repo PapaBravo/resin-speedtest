@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Internet Speed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+    <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/moment.min.js"></script>
+</head>
+
+<body>
+    <div class="ct-chart ct-perfect-fourth"></div>
+    <script>
+        fetch('data')
+            .then(res => res.json())
+            .then(res => {
+                data = res.map(s => {
+                    return { x: new Date(s.timestamp), y: s.speeds.download }
+                });
+                let chart = new Chartist.Line('.ct-chart',
+                    {
+                        series: [
+                            {
+                                name: 'download',
+                                data
+                            }
+                        ]
+                    }, {
+                        axisX: {
+                            type: Chartist.FixedScaleAxis,
+                            divisor: 5,
+                            labelInterpolationFnc: function (value) {
+                                return moment(value).format('MMM D');
+                            }
+                        }
+                    }
+                );
+            });
+        //document.getElementById('data').innerHTML = 
+    </script>
+</body>
+
+</html>

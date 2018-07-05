@@ -7,8 +7,9 @@ const app = express();
 
 const INTERVAL = 2 * 60 * 60 * 1000;
 
-// reply to request with "Hello World!"
-app.get('/', function (req, res) {
+app.use(express.static('public'));
+
+app.get('/data', function (req, res) {
   res.send(getData());
 });
 
