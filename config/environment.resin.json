@@ -1,0 +1,5 @@
+{
+    "environment": "resin",
+    "storage": "/data/local-storage",
+    "port": "80"
+}

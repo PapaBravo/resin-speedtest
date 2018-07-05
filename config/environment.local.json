@@ -1,0 +1,5 @@
+{
+    "environment": "local",
+    "storage": "local-storage/",
+    "port": "3000"
+}
