@@ -1,12 +1,11 @@
 
-global.config = require(`./config/environment.${process.env.NODE_ENV || 'resin'}.json`);
+global.config = require(`./config/environment.${process.env.NODE_ENV || 'local'}.json`);
 
 const {testSpeed, getData} = require('./src/speedtest');
 const express = require('express');
 const app = express();
 
 const INTERVAL = 30 * 60 * 1000;
-
 app.use(express.static('public'));
 
 app.get('/data', function (req, res) {

@@ -7,6 +7,7 @@
     <title>Internet Speed</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+    <link rel="stylesheet" href="style.css">
     <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/moment.min.js"></script>
 </head>
@@ -33,7 +34,7 @@
                             type: Chartist.FixedScaleAxis,
                             divisor: 5,
                             labelInterpolationFnc: function (value) {
-                                return moment(value).format('MMM D');
+                                return moment(value).format('MMM D HH:mm');
                             }
                         }
                     }
