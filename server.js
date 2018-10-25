@@ -5,7 +5,7 @@ const {testSpeed, getData} = require('./src/speedtest');
 const express = require('express');
 const app = express();
 
-const INTERVAL = 2 * 60 * 60 * 1000;
+const INTERVAL = 30 * 60 * 1000;
 
 app.use(express.static('public'));
 
