@@ -14,3 +14,11 @@ svg.ct-chart-bar, svg.ct-chart-line{
   transform: translate(-100%) rotate(-45deg);
   white-space:nowrap;
 }
+
+.ct-line {
+    stroke-width: 1px;
+}
+
+.ct-point {
+    stroke-width: 3px;
+}
