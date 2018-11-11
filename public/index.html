@@ -14,7 +14,43 @@
 
 <body>
     <div class="ct-chart ct-perfect-fourth"></div>
+    <button onclick="exportClick()">Download</button>
     <script>
+        function downloadCSV(csvContent) {
+            const filename = 'speeds.csv';
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(blob, filename);
+            } else {
+                const link = document.createElement("a");
+                if (link.download !== undefined) { // feature detection
+                    // Browsers that support HTML5 download attribute
+                    const url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", filename);
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            }
+        }
+
+        function exportClick() {
+            fetch('data')
+                .then(res => res.json())
+                .then(res => {
+                    let lines = [];
+                    lines.push(['timestamp', 'speed']);
+                    lines = lines.concat(res.map(s => [s.timestamp, s.speeds.download]));
+                    console.info(lines);
+
+                    const csv = lines.map(l => l.join(';')).join('\n');
+                    return csv;
+                })
+                .then(downloadCSV);
+        }
+
         fetch('data')
             .then(res => res.json())
             .then(res => {
