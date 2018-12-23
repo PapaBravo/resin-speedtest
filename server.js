@@ -2,6 +2,7 @@
 global.config = require(`./config/environment.${process.env.NODE_ENV || 'local'}.json`);
 
 const {testSpeed, getData} = require('./src/speedtest');
+const storage = require('./src/storage');
 const express = require('express');
 const app = express();
 
@@ -18,6 +19,7 @@ var server = app.listen(global.config.port, function () {
   var port = server.address().port;
   console.log('Timing app listening on port ', port);
 
-  testSpeed();
-  setInterval(testSpeed, INTERVAL);
+  storage.setup().then(res => console.log(res))
+  //testSpeed();
+  //setInterval(testSpeed, INTERVAL);
 });
