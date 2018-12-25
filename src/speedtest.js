@@ -1,11 +1,12 @@
 const speedTest = require('speedtest-net');
-const LocalStorage = require('node-localstorage').LocalStorage;
+const { LocalStorage } = require('node-localstorage');
+
 const localStorage = new LocalStorage(global.config.storage);
 const storageKey = 'TIMES';
 
 function updateStorage(data) {
     data.timestamp = new Date().toISOString();
-    console.log(`${data.timestamp}: Measured ${data.speeds.download} down and ${data.speeds.upload} up`)
+    console.log(`${data.timestamp}: Measured ${data.speeds.download} down and ${data.speeds.upload} up`);
     let oldValues = localStorage.getItem(storageKey);
     if (!oldValues) {
         oldValues = [];
@@ -17,9 +18,21 @@ function updateStorage(data) {
 }
 
 function testSpeed() {
-    let test = speedTest({ maxTime: 5000 });
+    const test = speedTest({
+        maxTime: 5000
+    });
     test.on('data', updateStorage);
     test.on('error', console.error.bind(console));
+}
+
+function getCurrentSpeed() {
+    return new Promise((resolve, reject) => {
+        const test = speedTest({
+            maxTime: 5000
+        });
+        test.on('data', resolve);
+        test.on('error', reject);
+    });
 }
 
 function getData() {
@@ -27,6 +40,7 @@ function getData() {
 }
 
 module.exports = {
+    getCurrentSpeed,
     testSpeed,
     getData
 };
