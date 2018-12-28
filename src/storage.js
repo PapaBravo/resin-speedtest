@@ -7,11 +7,6 @@ const localStorage = new LocalStorage(global.config.storage);
 
 const db = new sqlite3.Database(`${global.config.storage}db.sqlite`);
 
-const {
-    create
-} = require('./queries');
-
-
 async function run(query, params) {
     return new Promise((resolve, reject) => db.run(query, params, (err) => {
         if (err) {
@@ -29,8 +24,28 @@ async function all(query, params) {
     }));
 }
 
+async function prepare(query) {
+    return new Promise((resolve, reject) => {
+        const stmt = db
+            .prepare(query, err => (err ? reject(err) : resolve(stmt)));
+    });
+}
+
+async function runStatement(statement, params) {
+    return new Promise((resolve, reject) => statement
+        .run(params, err => (err ? reject(err) : resolve())));
+}
+
 async function setup() {
-    return run(create);
+    return run(`CREATE TABLE IF NOT EXISTS Speed (
+        download REAL,
+        upload REAL,
+        clientIp TEXT,
+        server TEXT,
+        ping REAL,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+`);
 }
 
 async function addMeasurement(data) {
@@ -61,9 +76,10 @@ async function migrateData() {
     INSERT INTO Speed (download, upload, clientIp, server, ping, timestamp)
     VALUES ($download, $upload, $clientIp, $server, $ping, $timestamp);
     `;
-    db.run('begin transaction');
-    values.forEach((v) => {
-        db.run(query, {
+    await run('BEGIN TRANSACTION');
+    const statement = await prepare(query);
+    for (const v of values) {
+        await runStatement(statement, {
             $download: v.speeds.download,
             $upload: v.speeds.upload,
             $clientIp: v.client.ip,
@@ -72,8 +88,8 @@ async function migrateData() {
             $timestamp: v.timestamp
         });
         console.log(`Migrated data from ${v.timestamp}`);
-    });
-    db.run('commit');
+    }
+    return run('COMMIT');
 }
 
 module.exports = {
