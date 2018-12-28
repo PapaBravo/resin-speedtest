@@ -14,7 +14,8 @@
 
 <body>
     <div class="ct-chart ct-perfect-fourth"></div>
-    <button onclick="exportClick()">Download</button>
+    <button onclick="exportClick()">CSV</button>
+    <button onclick="exportFullClick()">JSON</button>
     <script>
         function downloadFile(content, filename, type) {
             const blob = new Blob([content], { type });
@@ -48,6 +49,12 @@
                     return csv;
                 })
                 .then(csv => downloadFile(csv, 'speeds.csv', 'text/csv;charset=utf-8;'));
+        }
+
+        function exportFullClick() {
+            fetch('data')
+                .then(res => res.json())
+                .then(content => downloadFile(JSON.stringify(content), 'speeds.json', 'application/json;charset=utf-8;'));
         }
 
         fetch('data')
