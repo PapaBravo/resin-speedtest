@@ -16,9 +16,8 @@
     <div class="ct-chart ct-perfect-fourth"></div>
     <button onclick="exportClick()">Download</button>
     <script>
-        function downloadCSV(csvContent) {
-            const filename = 'speeds.csv';
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type });
             if (navigator.msSaveBlob) { // IE 10+
                 navigator.msSaveBlob(blob, filename);
             } else {
@@ -48,7 +47,7 @@
                     const csv = lines.map(l => l.join(';')).join('\n');
                     return csv;
                 })
-                .then(downloadCSV);
+                .then(csv => downloadFile(csv, 'speeds.csv', 'text/csv;charset=utf-8;'));
         }
 
         fetch('data')
@@ -76,7 +75,6 @@
                     }
                 );
             });
-        //document.getElementById('data').innerHTML = 
     </script>
 </body>
 
