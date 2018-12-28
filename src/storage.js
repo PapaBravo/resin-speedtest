@@ -16,7 +16,6 @@ async function run(query, params) {
     }));
 }
 
-
 async function all(query, params) {
     return new Promise((resolve, reject) => db.all(query, params, (err, res) => {
         if (err) reject(err);
@@ -71,25 +70,29 @@ async function getData() {
 }
 
 async function migrateData() {
-    const values = JSON.parse(localStorage.getItem('TIMES') || '[]');
-    const query = `
-    INSERT INTO Speed (download, upload, clientIp, server, ping, timestamp)
-    VALUES ($download, $upload, $clientIp, $server, $ping, $timestamp);
-    `;
-    await run('BEGIN TRANSACTION');
-    const statement = await prepare(query);
-    for (const v of values) {
-        await runStatement(statement, {
-            $download: v.speeds.download,
-            $upload: v.speeds.upload,
-            $clientIp: v.client.ip,
-            $server: v.server.host,
-            $ping: v.server.ping,
-            $timestamp: v.timestamp
-        });
-        console.log(`Migrated data from ${v.timestamp}`);
+    try {
+        const values = JSON.parse(localStorage.getItem('TIMES') || '[]');
+        const query = `
+            INSERT INTO Speed (download, upload, clientIp, server, ping, timestamp)
+            VALUES ($download, $upload, $clientIp, $server, $ping, $timestamp);
+        `;
+        await run('BEGIN TRANSACTION');
+        const statement = await prepare(query);
+        for (const v of values) {
+            await runStatement(statement, {
+                $download: v.speeds.download,
+                $upload: v.speeds.upload,
+                $clientIp: v.client.ip,
+                $server: v.server.host,
+                $ping: v.server.ping,
+                $timestamp: v.timestamp
+            });
+            console.log(`Migrated data from ${v.timestamp}`);
+        }
+        await run('COMMIT');
+    } catch (err) {
+        console.error('Problem migrating data', err);
     }
-    return run('COMMIT');
 }
 
 module.exports = {
