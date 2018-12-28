@@ -1,6 +1,6 @@
 
 
-const create = `CREATE TABLE Speed (
+const create = `CREATE TABLE IF NOT EXISTS Speed (
                     download REAL,
                     upload REAL,
                     clientIp TEXT,

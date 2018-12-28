@@ -1,6 +1,10 @@
 const sqlite3 = require('sqlite3');
-// const LocalStorage = require('node-localstorage').LocalStorage;
-// const localStorage = new LocalStorage(global.config.storage);
+const {
+    LocalStorage
+} = require('node-localstorage');
+
+const localStorage = new LocalStorage(global.config.storage);
+
 const db = new sqlite3.Database(`${global.config.storage}db.sqlite`);
 
 const {
@@ -51,8 +55,30 @@ async function getData() {
     return all(query);
 }
 
+async function migrateData() {
+    const values = JSON.parse(localStorage.getItem('TIMES') || '[]');
+    const query = `
+    INSERT INTO Speed (download, upload, clientIp, server, ping, timestamp)
+    VALUES ($download, $upload, $clientIp, $server, $ping, $timestamp);
+    `;
+    db.run('begin transaction');
+    values.forEach((v) => {
+        db.run(query, {
+            $download: v.speeds.download,
+            $upload: v.speeds.upload,
+            $clientIp: v.client.ip,
+            $server: v.server.host,
+            $ping: v.server.ping,
+            $timestamp: v.timestamp
+        });
+        console.log(`Migrated data from ${v.timestamp}`);
+    });
+    db.run('commit');
+}
+
 module.exports = {
     setup,
     addMeasurement,
-    getData
+    getData,
+    migrateData
 };
