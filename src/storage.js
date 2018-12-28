@@ -1,7 +1,15 @@
 const sqlite3 = require('sqlite3');
+const util = require('util');
+const fs = require('fs');
 const {
     LocalStorage
 } = require('node-localstorage');
+
+const jsonKey = 'TIMES';
+const jsonPath = `${global.config.storage}${jsonKey}`;
+
+const unlink = util.promisify(fs.unlink);
+const access = util.promisify(fs.access);
 
 const localStorage = new LocalStorage(global.config.storage);
 
@@ -69,7 +77,20 @@ async function getData() {
     return all(query);
 }
 
+async function isPresent(path) {
+    try {
+        await access(path);
+        return true;
+    } catch (err) {
+        return false;
+    }
+}
+
 async function migrateData() {
+    if (!await isPresent(jsonPath)) {
+        console.info('No data for migration.');
+        return;
+    }
     try {
         const values = JSON.parse(localStorage.getItem('TIMES') || '[]');
         const query = `
@@ -90,6 +111,7 @@ async function migrateData() {
             console.log(`Migrated data from ${v.timestamp}`);
         }
         await run('COMMIT');
+        await unlink(jsonPath);
     } catch (err) {
         console.error('Problem migrating data', err);
     }
