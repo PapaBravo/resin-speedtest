@@ -73,7 +73,7 @@ async function addMeasurement(data) {
 }
 
 async function getData() {
-    const query = 'SELECT * FROM Speed;';
+    const query = 'SELECT * FROM Speed ORDER BY timestamp;';
     return all(query);
 }
 

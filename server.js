@@ -24,6 +24,7 @@ const server = app.listen(global.config.port, () => {
         .then(() => {
             app.use(express.static('public'));
             app.get('/data', (req, res) => res.send(getData()));
+            app.get('/speeds', async (req, res) => res.send(await storage.getData()));
             return storage.migrateData();
             // setInterval(runSpeedTest, INTERVAL);
         });

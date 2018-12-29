@@ -37,14 +37,13 @@
         }
 
         function exportClick() {
-            fetch('data')
+            fetch('speeds')
                 .then(res => res.json())
                 .then(res => {
                     let lines = [];
-                    lines.push(['timestamp', 'speed']);
-                    lines = lines.concat(res.map(s => [s.timestamp, s.speeds.download]));
-                    console.info(lines);
-
+                    const headers = Object.keys(res[0]);
+                    lines.push(headers);
+                    lines = lines.concat(res.map(s => headers.map(h => s[h])));
                     const csv = lines.map(l => l.join(';')).join('\n');
                     return csv;
                 })
@@ -57,11 +56,11 @@
                 .then(content => downloadFile(JSON.stringify(content), 'speeds.json', 'application/json;charset=utf-8;'));
         }
 
-        fetch('data')
+        fetch('speeds')
             .then(res => res.json())
             .then(res => {
                 data = res.map(s => {
-                    return { x: new Date(s.timestamp), y: s.speeds.download }
+                    return { x: new Date(s.timestamp), y: s.download }
                 });
                 let chart = new Chartist.Line('.ct-chart',
                     {
