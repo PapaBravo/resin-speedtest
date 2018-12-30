@@ -3,8 +3,7 @@ global.config = require(`./config/environment.${process.env.NODE_ENV || 'local'}
 const express = require('express');
 const storage = require('./src/storage');
 
-const { getCurrentSpeed, getData } = require('./src/speedtest');
-
+const { getCurrentSpeed } = require('./src/speedtest');
 
 const app = express();
 
@@ -23,8 +22,8 @@ const server = app.listen(global.config.port, () => {
     storage.setup()
         .then(() => {
             app.use(express.static('public'));
-            app.get('/data', (req, res) => res.send(getData()));
-            app.get('/speeds', async (req, res) => res.send(await storage.getData()));
+            app.get('/data', (req, res) => res.send(storage.getData()));
+            app.get('/speeds', async (req, res) => res.send(await storage.getDownload()));
             return storage.migrateData();
             // setInterval(runSpeedTest, INTERVAL);
         });

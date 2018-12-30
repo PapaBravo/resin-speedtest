@@ -15,7 +15,6 @@
 <body>
     <div class="ct-chart ct-perfect-fourth"></div>
     <button onclick="exportClick()">CSV</button>
-    <button onclick="exportFullClick()">JSON</button>
     <script>
         function downloadFile(content, filename, type) {
             const blob = new Blob([content], { type });
@@ -37,7 +36,7 @@
         }
 
         function exportClick() {
-            fetch('speeds')
+            fetch('data')
                 .then(res => res.json())
                 .then(res => {
                     let lines = [];
@@ -50,25 +49,27 @@
                 .then(csv => downloadFile(csv, 'speeds.csv', 'text/csv;charset=utf-8;'));
         }
 
-        function exportFullClick() {
-            fetch('data')
-                .then(res => res.json())
-                .then(content => downloadFile(JSON.stringify(content), 'speeds.json', 'application/json;charset=utf-8;'));
-        }
-
         fetch('speeds')
             .then(res => res.json())
             .then(res => {
-                data = res.map(s => {
-                    return { x: new Date(s.timestamp), y: s.download }
-                });
-                let chart = new Chartist.Line('.ct-chart',
+                const data = {
+                    avg: res.map(s => ({ x: new Date(s.date), y: s.avg })),
+                    min: res.map(s => ({ x: new Date(s.date), y: s.min })),
+                    max: res.map(s => ({ x: new Date(s.date), y: s.max })),
+                };
+                const chart = new Chartist.Line('.ct-chart',
                     {
                         series: [
                             {
-                                name: 'download',
-                                data
-                            }
+                                name: 'avg',
+                                data: data.avg
+                            }, {
+                                name: 'min',
+                                data: data.min
+                            }, {
+                                name: 'max',
+                                data: data.max
+                            }, 
                         ]
                     }, {
                         axisX: {
@@ -76,6 +77,14 @@
                             divisor: 5,
                             labelInterpolationFnc: function (value) {
                                 return moment(value).format('MMM D HH:mm');
+                            }
+                        },
+                        series: {
+                            min: {
+                                showLine: false
+                            },
+                            max: {
+                                showLine: false
                             }
                         }
                     }

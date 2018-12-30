@@ -1,6 +1,7 @@
 const sqlite3 = require('sqlite3');
 const util = require('util');
 const fs = require('fs');
+const moment = require('moment');
 const {
     LocalStorage
 } = require('node-localstorage');
@@ -73,8 +74,31 @@ async function addMeasurement(data) {
 }
 
 async function getData() {
-    const query = 'SELECT * FROM Speed ORDER BY timestamp;';
+    const query = `
+        SELECT * FROM Speed 
+        ORDER BY timestamp;`;
     return all(query);
+}
+
+/**
+ * @param {moment.MomentInput} [from] Now minus one month is used by default
+ */
+async function getDownload(from) {
+    const start = from ? moment(from) : moment().subtract(2, 'month');
+    const query = `
+        SELECT 
+            MAX(download) max, 
+            MIN(download) min, 
+            AVG(download) avg, 
+            date(timestamp) date,
+            COUNT(download) count
+        FROM Speed 
+        WHERE timestamp > $start
+        GROUP BY date
+        ORDER BY date;`;
+    return all(query, {
+        $start: start.toISOString()
+    });
 }
 
 async function isPresent(path) {
@@ -121,5 +145,6 @@ module.exports = {
     setup,
     addMeasurement,
     getData,
-    migrateData
+    migrateData,
+    getDownload
 };
