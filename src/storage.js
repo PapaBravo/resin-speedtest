@@ -68,8 +68,7 @@ async function addMeasurement(data) {
         $upload: data.speeds.upload,
         $clientIp: data.client.ip,
         $server: data.server.host,
-        $ping: data.server.ping,
-        $timestamp: new Date().toISOString()
+        $ping: data.server.ping
     });
 }
 
